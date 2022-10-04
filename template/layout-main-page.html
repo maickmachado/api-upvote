@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>crypto list</title>
+    <style>
+        table,
+        th,
+        td {
+            border: 2px solid green;
+            text-align: center;
+        }
+
+        th,
+        td {
+            padding: 12px;
+        }
+
+        h1 {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>{{.PageTitle}}</h1>
+<h2>Crypto Total Amount: {{.CryptoCount}}</h2>
+<h3>fonte - coinbase</h3>
+<table style="width:50%">
+    <tr>
+        <th>CMC Rank</th>
+        <th>Name</th>
+        <th>Symbol</th>
+    </tr>
+    {{range .Cryptos.CryptoData}}
+    <tr>
+        <td>{{.CmcRank}}</td>
+        <td><a href="/cryptocoins/{{.Slug}}">{{.Name}}</a></td>
+        <td>{{.Symbol}}</td>
+    </tr>
+    {{end}}
+</table>
+</body>
+</html>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>crypto list</title>
+    <style>
+        table,
+        th,
+        td {
+            border: 2px solid green;
+            text-align: center;
+        }
+
+        th,
+        td {
+            padding: 12px;
+        }
+
+        h1 {
+            color: green;
+        }
+    </style>
+</head>
+<body>
+<h1>{{.PageTitle}}</h1>
+<h2>Crypto Total Amount</h2>
+<h3>fonte - coinbase</h3>
+<table style="width:50%">
+    <tr>
+        <th>CMC Rank</th>
+        <th>Name</th>
+        <th>Symbol</th>
+        <th>Price</th>
+        <th>Total de votos</th>
+        <th>Votar</th>
+    </tr>
+    <tr>
+        <td>{{.Cryptos.CmcRank}}</td>
+        <td>{{.Cryptos.Name}}</td>
+        <td>{{.Cryptos.Symbol}}</td>
+        <td>{{.Cryptos.Quote.Usd.Price}}</td>
+        <td>{{.Votes}}</td>
+        <td>
+            <form action="/cryptocoins/vote/{{.Cryptos.Slug}}" method="POST">
+                <button type="submit" onclick="alert('obrigado por votar!')">
+                    VOTAR
+                </button>
+            </form>
+        </td>
+    </tr>
+</table>
+</body>
+<footer>
+    <td><a href="/cryptocoins">VOLTAR</a></td>
+</footer>
+</html>
