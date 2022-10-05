@@ -12,129 +12,132 @@ import (
 
 var tmplMainPage = template.Must(template.ParseFiles("template/layout-main-page.html"))
 var tmplDetailPage = template.Must(template.ParseFiles("template/layout-detail-page.html"))
-var tmpl404 = template.Must(template.ParseFiles("template/layout-404.html"))
+var tmplError = template.Must(template.ParseFiles("template/layout-erro.html"))
 var tmplRanking = template.Must(template.ParseFiles("template/layout-ranking.html"))
 
 func GetAllData(w http.ResponseWriter, r *http.Request) {
-	//w.WriteHeader(http.StatusOK)
 
 	client := http.Client{}
 	req, err := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
 	if err != nil {
-		//Handle Error
+		ErrorHandler500(w, r)
+	} else {
+		req.Header = http.Header{
+			"X-CMC_PRO_API_KEY": {"ab8d13c8-9dae-417c-96a8-02e2e587563d"},
+		}
+
+		res, err := client.Do(req)
+		if err != nil {
+			log.Println(err)
+		}
+
+		var responseObject models.Response
+
+		err = json.NewDecoder(res.Body).Decode(&responseObject)
+		if err != nil {
+			log.Println(err)
+		}
+		//
+		comp := len(responseObject.CryptoData)
+
+		data := models.MainPageData{
+			PageTitle:   "Crypto List",
+			CryptoCount: comp,
+			Cryptos:     &responseObject,
+		}
+		err = tmplMainPage.Execute(w, data)
+		if err != nil {
+			ErrorHandler500(w, r)
+		}
 	}
-
-	req.Header = http.Header{
-		"X-CMC_PRO_API_KEY": {"ab8d13c8-9dae-417c-96a8-02e2e587563d"},
-		//"Content-Type":      {"application/json"},
-	}
-
-	res, err := client.Do(req)
-	if err != nil {
-		//Handle Error
-	}
-
-	var responseObject models.Response
-
-	json.NewDecoder(res.Body).Decode(&responseObject)
-	//
-	comp := len(responseObject.CryptoData)
-
-	data := models.MainPageData{
-		PageTitle:   "Crypto List",
-		CryptoCount: comp,
-		Cryptos:     &responseObject,
-	}
-	tmplMainPage.Execute(w, data)
-
 }
 
 func GetRanking(w http.ResponseWriter, r *http.Request) {
 
 	response, err := database.OrderByVotes()
 	if err != nil {
-
+		log.Println(err)
 	}
 
 	data := models.PageData{
-		PageTitle: "Crypto List",
-		//CryptoCount: int(comp),
+		PageTitle:       "Crypto List",
 		CryptosDataBase: response,
 	}
-	tmplRanking.Execute(w, data)
-
+	err = tmplRanking.Execute(w, data)
+	if err != nil {
+		ErrorHandler500(w, r)
+	}
 }
 
 func CryptoDetail(w http.ResponseWriter, r *http.Request) {
-	//w.WriteHeader(http.StatusOK)
 	vars := mux.Vars(r)
 	var detailResponseObject models.CryptoData
 	detailResponseObject.Slug = vars["name"]
 
 	client := http.Client{}
-	req, _ := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
-
-	req.Header = http.Header{
-		"X-CMC_PRO_API_KEY": {"ab8d13c8-9dae-417c-96a8-02e2e587563d"},
-		//INCLUIR A ZORRA DO COD 200 OU 404 OU ETC AQUI NO HEADER
-	}
-
-	res, _ := client.Do(req)
-
-	var responseObject models.Response
-	//PORQUE SEM O & NÃO PUXA NENHUM VALOR?
-	json.NewDecoder(res.Body).Decode(&responseObject)
-
-	cryptoMatchData, existTrue := database.CheckIfExist(responseObject, detailResponseObject)
-
-	if !existTrue {
-		ErrorHandler404(w, r)
+	req, err := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
+	if err != nil {
+		ErrorHandler500(w, r)
 	} else {
-		singleCrypto, _ := database.GetPending(detailResponseObject.Slug)
-		var vote int
-		if len(singleCrypto) == 0 {
-			vote = 0
-		} else {
-			vote = singleCrypto[0].Upvote
+		req.Header = http.Header{
+			"X-CMC_PRO_API_KEY": {"ab8d13c8-9dae-417c-96a8-02e2e587563d"},
 		}
 
-		data := models.DetailPageData{
-			PageTitle: "Crypto List",
-			Cryptos:   cryptoMatchData,
-			Votes:     vote,
+		res, _ := client.Do(req)
+
+		var responseObject models.Response
+		err = json.NewDecoder(res.Body).Decode(&responseObject)
+		if err != nil {
+			log.Println(err)
 		}
-		tmplDetailPage.Execute(w, data)
+
+		cryptoMatchData, existTrue := database.CheckIfExist(responseObject, detailResponseObject)
+
+		if !existTrue {
+			ErrorHandler404(w, r)
+		} else {
+			singleCrypto, err := database.GetCryptoInfoDataBase(detailResponseObject.Slug)
+			if err != nil {
+				log.Println(err)
+			}
+
+			var vote int
+
+			if len(singleCrypto) == 0 {
+				vote = 0
+			} else {
+				vote = singleCrypto[0].Upvote
+			}
+
+			data := models.DetailPageData{
+				PageTitle: "Crypto List",
+				Cryptos:   cryptoMatchData,
+				Votes:     vote,
+			}
+			err = tmplDetailPage.Execute(w, data)
+			if err != nil {
+				ErrorHandler500(w, r)
+			}
+		}
 	}
 }
 
 func VoteCrypto(w http.ResponseWriter, r *http.Request) {
-	//w.WriteHeader(http.StatusOK)
 	vars := mux.Vars(r)
 	crypto := vars["text"]
 	database.Upvote(crypto)
 	GetAllData(w, r)
-	//w.Header().Set("Content-Type", "application/json")
-	//cryptos, _ := database.GetAll()
-	////for i, v := range tasks {
-	////	w.Write([]byte(fmt.Sprintf("%d: %s - total de votos: %v\n", i+1, v.Text, v.Upvote)))
-	////}
-	//data := models.PageData{
-	//	PageTitle: "Crypto List",
-	//	CryptosDataBase:   cryptos,
-	//}
-	//tmplMainPage.Execute(w, data)
-	////w.WriteHeader(http.StatusOK)
-	////w.Write([]byte(fmt.Sprintf("TEste")))
 }
 
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusInternalServerError)
-	w.Header().Set("Content-Type", "application/json")
-	resp := make(map[string]string)
-	resp["message"] = "Some Error Occurred"
-	jsonResp, err := json.Marshal(resp)
-	if err != nil {
-		log.Fatalf("Error happened in JSON marshal. Err: %s", err)
-	}
-	w.Write(jsonResp)
-}
+//func HealthCheck(w http.ResponseWriter, r *http.Request) {
+//	resp := make(map[string]string)
+//	resp["message"] = "Some Error Occurred"
+//	jsonResp, err := json.Marshal(resp)
+//	if err != nil {
+//		log.Println(err)
+//	}
+//	_, err = w.Write(jsonResp)
+//	if err != nil {
+//		ErrorHandler500(w, r)
+//	}
+//}
