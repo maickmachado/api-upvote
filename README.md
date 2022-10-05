@@ -20,7 +20,6 @@ Get all registred cryptos at CoinBase API:
 Get crypto detail:
 
 ```curl
-curl --request POST \
   http://localhost:8080/cryptocoins/{name}
 ```
 
@@ -37,8 +36,6 @@ Upvote a crypto:
 ```
 
 ## Estrutura da aplicação
-
-I have inspiration on [this repo](https://github.com/golang-standards/project-layout) .
 
 ```
 │   readme.md
@@ -72,13 +69,17 @@ I have inspiration on [this repo](https://github.com/golang-standards/project-la
 ### Database
 
 MongoDB:
+
 Nome do database: cryptocoins
+
 Nome da coleção: crypto
 
 ### API CoinBase
 
 URL: https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest
+
 Chave: X-CMC_PRO_API_KEY
+
 API key: ab8d13c8-9dae-417c-96a8-02e2e587563d
 
 ## Tests
