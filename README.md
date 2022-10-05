@@ -4,9 +4,9 @@ Projeto com o objetivo de criar um ranking baseado em votos que as cryptos moeda
 
 ## O que a aplicação faz
 
-A aplicação utiliza a API do CoinBase para pegar a informação das principais cryptos.
-O usuário pode acessar a lista com todas essas cryptos e acessar cada uma para pegar os detalhes dela como o preço atual, além disso é possível votar na mesma.
-O usuário poderá verificar quais as cryptos mais votadas, essa informação é armazenada no banco de dados MongoDB.
+A aplicação utiliza a API do CoinBase para pegar a informação das principais cryptos.<br/>
+O usuário pode acessar a lista com todas essas cryptos e acessar cada uma para pegar os detalhes dela como o preço atual, além disso é possível votar na mesma.<br/>
+O usuário poderá verificar quais as cryptos mais votadas, essa informação é armazenada no banco de dados MongoDB.<br/>
 Toda a aplicação é feita com interface em HTML.
 
 ## Endpoints
@@ -68,18 +68,14 @@ Upvote a crypto:
 
 ### Database
 
-MongoDB:
-
-Nome do database: cryptocoins
-
+MongoDB:<br/>
+Nome do database: cryptocoins<br/>
 Nome da coleção: crypto
 
 ### API CoinBase
 
-URL: https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest
-
-Chave: X-CMC_PRO_API_KEY
-
+URL: https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest<br/>
+Chave: X-CMC_PRO_API_KEY<br/>
 API key: ab8d13c8-9dae-417c-96a8-02e2e587563d
 
 ## Tests
