@@ -6,6 +6,7 @@ import (
 	"github.com/maickmachado/upvote-api/database"
 	"github.com/maickmachado/upvote-api/models"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 )
@@ -129,15 +130,11 @@ func VoteCrypto(w http.ResponseWriter, r *http.Request) {
 	GetAllData(w, r)
 }
 
-//func HealthCheck(w http.ResponseWriter, r *http.Request) {
-//	resp := make(map[string]string)
-//	resp["message"] = "Some Error Occurred"
-//	jsonResp, err := json.Marshal(resp)
-//	if err != nil {
-//		log.Println(err)
-//	}
-//	_, err = w.Write(jsonResp)
-//	if err != nil {
-//		ErrorHandler500(w, r)
-//	}
-//}
+func HealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Header().Set("Content-Type", "application/json")
+
+	// In the future we could report back on the status of our DB, or our cache
+	// (e.g. Redis) by performing a simple PING, and include them in the response.
+	io.WriteString(w, `{"alive": true}`)
+}

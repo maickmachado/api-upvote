@@ -13,7 +13,7 @@ func HandleRequest() {
 	myRouter.HandleFunc("/cryptocoins", controllers.GetAllData).Methods("GET")
 	myRouter.HandleFunc("/ranking", controllers.GetRanking).Methods("GET")
 	myRouter.HandleFunc("/cryptocoins/{name}", controllers.CryptoDetail).Methods("GET")
-	//myRouter.HandleFunc("/healthcheck", controllers.HealthCheck).Methods("GET")
+	myRouter.HandleFunc("/healthcheck", controllers.HealthCheck).Methods("GET")
 	myRouter.HandleFunc("/cryptocoins/vote/{text}", controllers.VoteCrypto).Methods("POST")
 	myRouter.NotFoundHandler = http.Handler(http.HandlerFunc(controllers.ErrorHandler404))
 
