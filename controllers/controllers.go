@@ -11,12 +11,8 @@ import (
 	"net/http"
 )
 
-var tmplMainPage = template.Must(template.ParseFiles("template/layout-main-page.html"))
-var tmplDetailPage = template.Must(template.ParseFiles("template/layout-detail-page.html"))
-var tmplError = template.Must(template.ParseFiles("template/layout-erro.html"))
-var tmplRanking = template.Must(template.ParseFiles("template/layout-ranking.html"))
-
 func GetAllData(w http.ResponseWriter, r *http.Request) {
+	TmplMainPage, _ := template.ParseFiles("./template/layout-main-page.html")
 
 	client := http.Client{}
 	req, err := http.NewRequest("GET", "https://pro-api.coinmarketcap.com/v1/cryptocurrency/listings/latest", nil)
@@ -46,7 +42,7 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 			CryptoCount: comp,
 			Cryptos:     &responseObject,
 		}
-		err = tmplMainPage.Execute(w, data)
+		err = TmplMainPage.Execute(w, data)
 		if err != nil {
 			ErrorHandler500(w, r)
 		}
@@ -54,6 +50,8 @@ func GetAllData(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetRanking(w http.ResponseWriter, r *http.Request) {
+
+	TmplRanking, _ := template.ParseFiles("./template/layout-ranking.html")
 
 	response, err := database.OrderByVotes()
 	if err != nil {
@@ -64,13 +62,15 @@ func GetRanking(w http.ResponseWriter, r *http.Request) {
 		PageTitle:       "Crypto List",
 		CryptosDataBase: response,
 	}
-	err = tmplRanking.Execute(w, data)
+	err = TmplRanking.Execute(w, data)
 	if err != nil {
 		ErrorHandler500(w, r)
 	}
 }
 
 func CryptoDetail(w http.ResponseWriter, r *http.Request) {
+	TmplDetailPage, _ := template.ParseFiles("./template/layout-detail-page.html")
+
 	vars := mux.Vars(r)
 	var detailResponseObject models.CryptoData
 	detailResponseObject.Slug = vars["name"]
@@ -115,7 +115,7 @@ func CryptoDetail(w http.ResponseWriter, r *http.Request) {
 				Cryptos:   cryptoMatchData,
 				Votes:     vote,
 			}
-			err = tmplDetailPage.Execute(w, data)
+			err = TmplDetailPage.Execute(w, data)
 			if err != nil {
 				ErrorHandler500(w, r)
 			}

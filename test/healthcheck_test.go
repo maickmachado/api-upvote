@@ -9,17 +9,13 @@ import (
 
 func TestHealthCheck(t *testing.T) {
 	tt := []struct {
-		name   string
-		method string
-		//input      *Pizzas
-		//want       string
+		name       string
+		method     string
 		statusCode int
 	}{
 		{
-			name:   "status ok",
-			method: http.MethodGet,
-			//input:      &Pizzas{},
-			//want:       "Error: No pizzas found",
+			name:       "status ok",
+			method:     http.MethodGet,
 			statusCode: http.StatusOK,
 		},
 	}
